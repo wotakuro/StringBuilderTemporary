@@ -8,7 +8,7 @@ C#では、string同士の足し算だと temporaryでメモリを大量に確保されるため、System.T
 
 string str = "aaa" + 20 + "bbbb"; <br />
 　　↓<br/>
-string str = Sbt.i + "aaa" + 20 + "bbbb"; 
+string str = Sbt.i + "aaa" + 20 + "bbbb"; <br/>
 とすることで、処理が大分まともになります。
 
 Sbt.iは、ThreadSafeではありません。あと同じオブジェクトを使いまわします。
