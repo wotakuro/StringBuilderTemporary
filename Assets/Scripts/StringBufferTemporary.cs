@@ -92,6 +92,77 @@ namespace StringBufferTemporary
 			return sb.ToString();
 		}
 
+        public Sbt ToLower()
+        {
+            char[] tmp = new char[1];
+            int length = sb.Length;
+            for (int i = 0; i < length; ++i)
+            {
+                sb.CopyTo(i, tmp, 0, 1);
+                if (char.IsUpper(tmp[0]))
+                {
+                    sb.Replace(tmp[0], char.ToLower(tmp[0]),i,1);
+                }
+            }
+            return this;
+        }
+        public Sbt ToUpper()
+        {
+            char[] tmp = new char[1];
+            int length = sb.Length;
+            for (int i = 0; i < length; ++i)
+            {
+                sb.CopyTo(i, tmp, 0, 1);
+                if (char.IsLower(tmp[0]))
+                {
+                    sb.Replace(tmp[0], char.ToUpper(tmp[0]), i, 1);
+                }
+            }
+            return this;
+        }
+
+        public Sbt Trim()
+        {
+            return TrimEnd().TrimStart();
+        }
+
+        public Sbt TrimStart()
+        {
+            char[] tmp = new char[1];
+            int length = sb.Length;
+            for (int i = 0; i < length; ++i)
+            {
+                sb.CopyTo(i, tmp, 0, 1);
+                if (!char.IsWhiteSpace(tmp[0]))
+                {
+                    if (i > 0)
+                    {
+                        sb.Remove(0, i);
+                    }
+                    break;
+                }
+            }
+            return this;
+        }
+        public Sbt TrimEnd()
+        {
+            char[] tmp = new char[1];
+            int length = sb.Length;
+            for (int i = length - 1; i >= 0; --i)
+            {
+                sb.CopyTo(i, tmp, 0, 1);
+                if (!char.IsWhiteSpace(tmp[0]))
+                {
+                    if ( i < length - 1 )
+                    {
+                        sb.Remove(i, length - i);
+                    }
+                    break;
+                }
+            }
+            return this;
+        }
+
 
 		public static implicit operator string(Sbt t)
 		{
