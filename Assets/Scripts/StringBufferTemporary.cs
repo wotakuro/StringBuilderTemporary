@@ -9,7 +9,10 @@ namespace StringBufferTemporary
 	/// string str = Sbt.i + "aaa" + 20 + "bbbb"; とすることで、処理が大分まともになります。
 	/// 
 	/// Sbt.iは、ThreadSafeではありません。あと同じオブジェクトを使いまわします。
+    /// 
 	/// そういうケースで使いたい場合は、Sbt.Create()を代わりに使用してください
+    /// もしくは Sbt.small / Sbt.medium / Sbt.large でも可能です。
+    /// この辺りはインスタンスを生成するので安全です
 	/// </summary>
 	public class Sbt
 	{
@@ -30,6 +33,29 @@ namespace StringBufferTemporary
 			return new Sbt(capacity);
 		}
 
+        public static Sbt small
+        {
+            get
+            {
+                return Create(64);
+            }
+        }
+
+        public static Sbt medium
+        {
+            get
+            {
+                return Create(256);
+            }
+        }
+        public static Sbt large
+        {
+            get
+            {
+                return Create(1024);
+            }
+        }
+
 		public static Sbt i
 		{
 			get
@@ -38,6 +64,7 @@ namespace StringBufferTemporary
 				return s_this;
 			}
 		}
+
 		public int Capacity
 		{
 			set { this.sb.Capacity = value; }
@@ -49,13 +76,15 @@ namespace StringBufferTemporary
 			set { this.sb.Length = value; }
 			get { return this.sb.Length; }
 		}
-		public void Remove(int startIndex, int length)
+		public Sbt Remove(int startIndex, int length)
 		{
 			sb.Remove(startIndex, length);
+            return this;
 		}
-		public void Replace(string oldValue, string newValue)
+		public Sbt Replace(string oldValue, string newValue)
 		{
 			sb.Replace(oldValue, newValue);
+            return this;
 		}
 
 		public override string ToString()
