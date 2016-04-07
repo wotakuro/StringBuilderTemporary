@@ -1,6 +1,7 @@
 # StringBuilderTemporary
 <pre>
-C#では、string同士の足し算だと temporaryでメモリを大量に確保されるため、System.Text.StringBufferの使用する方がパフォーマンス的にもメモリ的にも良いです。
+C#では、string同士の足し算だと temporaryでメモリを大量に確保されるため、
+System.Text.StringBufferの使用する方がパフォーマンス的にもメモリ的にも良いです。
 
 ですが、既に出来上がってしまったものをイチイチ対応するのはとても大変です。
 そこで、処理をまともにするコードを簡単に書けるためのクラスを今回用意しました
