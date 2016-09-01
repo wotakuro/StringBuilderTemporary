@@ -1,28 +1,47 @@
 # StringBuilderTemporary
+Read this in other languages: English, [日本語](README.ja.md)<br />
+
 <pre>
-C#では、string同士の足し算だと temporaryでメモリを大量に確保されるため、
-System.Text.StringBufferの使用する方がパフォーマンス的にもメモリ的にも良いです。
+Concatenating many strings allocates much teporary memory in Managed Heap.
+It is better to use "System.Text.StringBuffer".
 
-ですが、既に出来上がってしまったものをイチイチ対応するのはとても大変です。
-そこで、処理をまともにするコードを簡単に書けるためのクラスを今回用意しました
+But it was heavy task,if you have already written many code.
+So we prepare this to fix that case easily.
+
+----
+before code
+  string str = "aaa" + 20 + "bbbb"; 
+
+after code 
+  string str = Sbt.i + "aaa" + 20 + "bbbb"; 
+----
+You only have to put "Sbt.i" before string concat operation.
+
+( Internal , "Sbt.i" uses StringBuilder class.
+  We implement it by overriding "operator +" and implicit cast.)
 
 
-string str = "aaa" + 20 + "bbbb"; 
-　　↓
-string str = Sbt.i + "aaa" + 20 + "bbbb"; 
-とすることで、処理が大分まともになります。
-（内部的にはStringBuilderを利用します。
-　operatorで + 演算子の上書き、暗黙的castを書くことで処理向上を行っております)
+"Sbt.i" is not "ThreadSafe" , and reuse same object.
+You can use "Sbt.small" / "Sbt.medium" / "Sbt.large" instead of "Sbt.i". 
+These are creating instance. So it is "Thread safe".</pre>
 
-Sbt.iは、ThreadSafeではありません。あと同じオブジェクトを使いまわします。
-そういうケースで使いたい場合は、Sbt.Create()を代わりに使用してください。
-</pre>
-
-# Stringでの加算処理の重さテスト
+# Test case
 <pre>
-本プロジェクトには、Stringでの加算処理がドレだけ重いか確認するためにテストケースを用意しました。
-testシーンを開いて実行してみてください。Profilerで確認するとドレほど重いかが確認できます。
+We prepared test case.
 
-画面をクリックすることで、今回の Sbt.iを入れるかどうかの変更が可能になっています。
-画面中の「sbt Flag」がtrueになることで処理が格段に軽くなるのを確認できるかと思います。
+Open "test.scene" and run.
+To click screen , you can change using "Sbt.i" or not.
+If "sbt Flag true" comes on screen , program runs much more faster.
+
+
+This is the result of our test.
+ - Execute Time   : 275 msec => 3.5msec
+ - Managed memory : 382.2MB -> 360B 
+
+--- excute code ---
+ string str = "TestD";
+     for (int i = 0; i < 20000; ++i){
+         str += "a";
+ }
+------------------
 </pre>
