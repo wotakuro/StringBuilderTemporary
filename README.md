@@ -5,7 +5,7 @@ Read this in other languages: English, [日本語](README.ja.md)<br />
 Concatenating many strings allocates much teporary memory in Managed Heap.
 It is better to use "System.Text.StringBuffer".
 
-But it was heavy task,if you have already written many code.
+But it is heavy task to fix it,if you have already written many code.
 So we prepare this to fix that case easily.
 
 ----
@@ -23,9 +23,10 @@ You only have to put "Sbt.i" before string concat operation.
 
 "Sbt.i" is not "ThreadSafe" , and reuse same object.
 You can use "Sbt.small" / "Sbt.medium" / "Sbt.large" instead of "Sbt.i". 
-These are creating instance. So it is "Thread safe".</pre>
+These are creating instance. So it is "Thread safe".
+</pre>
 
-# Test case
+#Test case
 <pre>
 We prepared test case.
 
