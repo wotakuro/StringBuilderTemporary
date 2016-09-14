@@ -82,6 +82,9 @@ namespace StringBufferTemporary
             }
         }
 
+        /// <summary>
+        /// Be careful . This isn't thread safe.
+        /// </summary>
         public static Sbt i
         {
             get
@@ -118,30 +121,33 @@ namespace StringBufferTemporary
             return sb.ToString();
         }
 
+        public void Clear()
+        {
+            // StringBuilder.Clear() doesn't support .Net 3.5...
+            // "Capasity = 0" doesn't work....
+            sb = new StringBuilder(0);
+        }
+
         public Sbt ToLower()
         {
-            char[] tmp = new char[1];
             int length = sb.Length;
             for (int i = 0; i < length; ++i)
             {
-                sb.CopyTo(i, tmp, 0, 1);
-                if (char.IsUpper(tmp[0]))
+                if (char.IsUpper(sb[i]))
                 {
-                    sb.Replace(tmp[0], char.ToLower(tmp[0]), i, 1);
+                    sb.Replace(sb[i], char.ToLower(sb[i]), i, 1);
                 }
             }
             return this;
         }
         public Sbt ToUpper()
         {
-            char[] tmp = new char[1];
             int length = sb.Length;
             for (int i = 0; i < length; ++i)
             {
-                sb.CopyTo(i, tmp, 0, 1);
-                if (char.IsLower(tmp[0]))
+                if (char.IsLower(sb[i]))
                 {
-                    sb.Replace(tmp[0], char.ToUpper(tmp[0]), i, 1);
+                    sb.Replace(sb[i], char.ToUpper(sb[i]), i, 1);
                 }
             }
             return this;
@@ -154,12 +160,10 @@ namespace StringBufferTemporary
 
         public Sbt TrimStart()
         {
-            char[] tmp = new char[1];
             int length = sb.Length;
             for (int i = 0; i < length; ++i)
             {
-                sb.CopyTo(i, tmp, 0, 1);
-                if (!char.IsWhiteSpace(tmp[0]))
+                if (!char.IsWhiteSpace(sb[i]))
                 {
                     if (i > 0)
                     {
@@ -172,12 +176,10 @@ namespace StringBufferTemporary
         }
         public Sbt TrimEnd()
         {
-            char[] tmp = new char[1];
             int length = sb.Length;
             for (int i = length - 1; i >= 0; --i)
             {
-                sb.CopyTo(i, tmp, 0, 1);
-                if (!char.IsWhiteSpace(tmp[0]))
+                if (!char.IsWhiteSpace(sb[i]))
                 {
                     if (i < length - 1)
                     {
