@@ -1,10 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
-using StringBufferTemporary;
+using System.Threading;
+
+using StrOpe = StringOperationUtil.OptimizedStringOperation;
 
 public class TestScript : MonoBehaviour {
 
-	bool sbtFlag = true;
+	bool strOpeFlag = true;
 	TextMesh txt;
 	// Use this for initialization
 	void Start () {
@@ -13,9 +15,9 @@ public class TestScript : MonoBehaviour {
 
 	void Update() {
 		if (Input.GetMouseButtonDown(0)) {
-			sbtFlag = !sbtFlag;
+			strOpeFlag = !strOpeFlag;
 		}
-		if (sbtFlag)
+		if (strOpeFlag)
 		{
 			UpdateSbtOn();
 		}
@@ -24,14 +26,13 @@ public class TestScript : MonoBehaviour {
 			UpdateSbtOff();
 		}
 		int gcUsed = (int)Profiler.GetMonoUsedSize();
-		this.txt.text = (Sbt.i + "sbtFlag " + sbtFlag + "\n" + "detltaTime:" + Time.deltaTime).ToUpper();
+		this.txt.text = (StrOpe.i + "StrOpeFlag " + strOpeFlag + "\n" + "detltaTime:" + Time.deltaTime).ToUpper();
 	}
 	
 	// Update is called once per frame
 	void UpdateSbtOn()
 	{
-		// Sbt str = Sbt.i + "test";
-		var str = Sbt.i + "TestD";
+		var str = StrOpe.i + "TestD";
 		for (int i = 0; i < 20000; ++i)
 		{
 			str += "a";
@@ -40,12 +41,11 @@ public class TestScript : MonoBehaviour {
 	}
 	void UpdateSbtOff()
 	{
-		// string str = "test";
         var str = "TestD";
 		for (int i = 0; i < 20000; ++i)
 		{
 			str += "a";
 		}
-        str.ToLower() ;
+        str.ToUpper();
     }
 }

@@ -5,33 +5,38 @@ Read this in other languages: English, [日本語](README.ja.md)<br />
 Concatenating many strings allocates much teporary memory in Managed Heap.
 It is better to use "System.Text.StringBuffer".
 
-But it is heavy task to fix it,if you have already written many code.
+But it was heavy task to fix it,if you have already written many code.
 So we prepare this to fix that case easily.
+
+
+To use this , you put this on the top of code.
+------
+using StrOpe = StringOperationUtil.OptimizedStringOperation;
+------
 
 ----
 before code
   string str = "aaa" + 20 + "bbbb"; 
 
 after code 
-  string str = Sbt.i + "aaa" + 20 + "bbbb"; 
+  string str = StrOpe.i + "aaa" + 20 + "bbbb"; 
 ----
-You only have to put "Sbt.i" before string concat operation.
+You only have to put "StrOpe.i" before string concat operation.
 
-( Internal , "Sbt.i" uses StringBuilder class.
+( Internal , "StrOpe.i" uses StringBuilder class.
   We implement it by overriding "operator +" and implicit cast.)
 
 
-"Sbt.i" is not "ThreadSafe" , and reuse same object.
-You can use "Sbt.small" / "Sbt.medium" / "Sbt.large" instead of "Sbt.i". 
-These are creating instance. So it is "Thread safe".
-</pre>
+"StrOpe.i" reuse same object.
+You can use "StrOpe.small" / "StrOpe.medium" / "StrOpe.large" instead of "StrOpe.i". 
+These are creating instance. So it is "Thread safe".</pre>
 
-#Test case
+# Test case
 <pre>
 We prepared test case.
 
 Open "test.scene" and run.
-To click screen , you can change using "Sbt.i" or not.
+To click screen , you can change using "StrOpe.i" or not.
 If "sbt Flag true" comes on screen , program runs much more faster.
 
 

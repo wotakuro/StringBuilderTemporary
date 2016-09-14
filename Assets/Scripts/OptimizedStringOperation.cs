@@ -24,42 +24,47 @@ SOFTWARE.
 using System.Threading;
 using System.Text;
 
-namespace StringBufferTemporary
+namespace StringOperationUtil
 {
     /// <summary>
     /// Using this,you can optimize string concat operation easily.
+    /// You 
     /// 
     /// - before code
     /// string str = "aaa" + 20 + "bbbb";
     /// 
     /// - after code
-    /// string str = Sbt.i + "aaa" + 20 + "bbbb";
+    /// string str = StrOpe.i + "aaa" + 20 + "bbbb";
     /// 
-    /// "Sbt.i" is not "ThreadSafe" , and reuse same object.
+    /// "StrOpe.i" is for MainThread , do not call from other theads.
+    /// If "StrOpe.i" is called from Mainthread , reuse same object.
     /// 
-    /// You can use "Sbt.small" / "Sbt.medium" / "Sbt.large" instead of "Sbt.i". 
-    /// These are creating instance. So it is "Thread safe".
+    /// You can also use "StrOpe.small" / "StrOpe.medium" / "StrOpe.large" instead of "StrOpe.i". 
+    /// These are creating instance.
     /// </summary>
-    public class Sbt
+    public class OptimizedStringOperation
     {
-        private static Sbt s_this;
-        private StringBuilder sb;
+        private static OptimizedStringOperation s_this = null;
+        #if !UNITY_WEBGL
+        private static Thread singletonThread = null;
+        #endif
+        private StringBuilder sb = null;
 
-        static Sbt()
+        static OptimizedStringOperation()
         {
-            s_this = new Sbt(1024);
+            s_this = new OptimizedStringOperation(1024);
         }
-        private Sbt(int capacity)
+        private OptimizedStringOperation(int capacity)
         {
             sb = new StringBuilder(capacity);
         }
 
-        public static Sbt Create(int capacity)
+        public static OptimizedStringOperation Create(int capacity)
         {
-            return new Sbt(capacity);
+            return new OptimizedStringOperation(capacity);
         }
 
-        public static Sbt small
+        public static OptimizedStringOperation small
         {
             get
             {
@@ -67,14 +72,14 @@ namespace StringBufferTemporary
             }
         }
 
-        public static Sbt medium
+        public static OptimizedStringOperation medium
         {
             get
             {
                 return Create(256);
             }
         }
-        public static Sbt large
+        public static OptimizedStringOperation large
         {
             get
             {
@@ -82,10 +87,25 @@ namespace StringBufferTemporary
             }
         }
 
-        public static Sbt i
+        public static OptimizedStringOperation i
         {
             get
             {
+                #if !UNITY_WEBGL
+                // Bind instance to thread.
+                if (singletonThread == null )
+                {
+                    singletonThread = Thread.CurrentThread;
+                }
+                // check thread...
+                if (singletonThread != Thread.CurrentThread)
+                {
+                    #if DEBUG || UNITY_EDITOR
+                    UnityEngine.Debug.LogError("Execute from another thread.");
+                    #endif
+                    return small;
+                }
+                #endif
                 s_this.sb.Length = 0;
                 return s_this;
             }
@@ -102,12 +122,12 @@ namespace StringBufferTemporary
             set { this.sb.Length = value; }
             get { return this.sb.Length; }
         }
-        public Sbt Remove(int startIndex, int length)
+        public OptimizedStringOperation Remove(int startIndex, int length)
         {
             sb.Remove(startIndex, length);
             return this;
         }
-        public Sbt Replace(string oldValue, string newValue)
+        public OptimizedStringOperation Replace(string oldValue, string newValue)
         {
             sb.Replace(oldValue, newValue);
             return this;
@@ -118,48 +138,49 @@ namespace StringBufferTemporary
             return sb.ToString();
         }
 
-        public Sbt ToLower()
+        public void Clear()
         {
-            char[] tmp = new char[1];
+            // StringBuilder.Clear() doesn't support .Net 3.5...
+            // "Capasity = 0" doesn't work....
+            sb = new StringBuilder(0);
+        }
+
+        public OptimizedStringOperation ToLower()
+        {
             int length = sb.Length;
             for (int i = 0; i < length; ++i)
             {
-                sb.CopyTo(i, tmp, 0, 1);
-                if (char.IsUpper(tmp[0]))
+                if (char.IsUpper(sb[i]))
                 {
-                    sb.Replace(tmp[0], char.ToLower(tmp[0]), i, 1);
+                    sb.Replace(sb[i], char.ToLower(sb[i]), i, 1);
                 }
             }
             return this;
         }
-        public Sbt ToUpper()
+        public OptimizedStringOperation ToUpper()
         {
-            char[] tmp = new char[1];
             int length = sb.Length;
             for (int i = 0; i < length; ++i)
             {
-                sb.CopyTo(i, tmp, 0, 1);
-                if (char.IsLower(tmp[0]))
+                if (char.IsLower(sb[i]))
                 {
-                    sb.Replace(tmp[0], char.ToUpper(tmp[0]), i, 1);
+                    sb.Replace(sb[i], char.ToUpper(sb[i]), i, 1);
                 }
             }
             return this;
         }
 
-        public Sbt Trim()
+        public OptimizedStringOperation Trim()
         {
             return TrimEnd().TrimStart();
         }
 
-        public Sbt TrimStart()
+        public OptimizedStringOperation TrimStart()
         {
-            char[] tmp = new char[1];
             int length = sb.Length;
             for (int i = 0; i < length; ++i)
             {
-                sb.CopyTo(i, tmp, 0, 1);
-                if (!char.IsWhiteSpace(tmp[0]))
+                if (!char.IsWhiteSpace(sb[i]))
                 {
                     if (i > 0)
                     {
@@ -170,14 +191,12 @@ namespace StringBufferTemporary
             }
             return this;
         }
-        public Sbt TrimEnd()
+        public OptimizedStringOperation TrimEnd()
         {
-            char[] tmp = new char[1];
             int length = sb.Length;
             for (int i = length - 1; i >= 0; --i)
             {
-                sb.CopyTo(i, tmp, 0, 1);
-                if (!char.IsWhiteSpace(tmp[0]))
+                if (!char.IsWhiteSpace(sb[i]))
                 {
                     if (i < length - 1)
                     {
@@ -190,53 +209,53 @@ namespace StringBufferTemporary
         }
 
 
-        public static implicit operator string(Sbt t)
+        public static implicit operator string(OptimizedStringOperation t)
         {
             return t.ToString();
         }
 
         #region ADD_OPERATOR
-        public static Sbt operator +(Sbt t, bool v)
+        public static OptimizedStringOperation operator +(OptimizedStringOperation t, bool v)
         {
             t.sb.Append(v);
             return t;
         }
-        public static Sbt operator +(Sbt t, int v)
+        public static OptimizedStringOperation operator +(OptimizedStringOperation t, int v)
         {
             t.sb.Append(v);
             return t;
         }
-        public static Sbt operator +(Sbt t, short v)
+        public static OptimizedStringOperation operator +(OptimizedStringOperation t, short v)
         {
             t.sb.Append(v);
             return t;
         }
-        public static Sbt operator +(Sbt t, byte v)
+        public static OptimizedStringOperation operator +(OptimizedStringOperation t, byte v)
         {
             t.sb.Append(v);
             return t;
         }
-        public static Sbt operator +(Sbt t, float v)
+        public static OptimizedStringOperation operator +(OptimizedStringOperation t, float v)
         {
             t.sb.Append(v);
             return t;
         }
-        public static Sbt operator +(Sbt t, char c)
+        public static OptimizedStringOperation operator +(OptimizedStringOperation t, char c)
         {
             t.sb.Append(c);
             return t;
         }
-        public static Sbt operator +(Sbt t, char[] c)
+        public static OptimizedStringOperation operator +(OptimizedStringOperation t, char[] c)
         {
             t.sb.Append(c);
             return t;
         }
-        public static Sbt operator +(Sbt t, string str)
+        public static OptimizedStringOperation operator +(OptimizedStringOperation t, string str)
         {
             t.sb.Append(str);
             return t;
         }
-        public static Sbt operator +(Sbt t, StringBuilder sb)
+        public static OptimizedStringOperation operator +(OptimizedStringOperation t, StringBuilder sb)
         {
             t.sb.Append(sb);
             return t;
