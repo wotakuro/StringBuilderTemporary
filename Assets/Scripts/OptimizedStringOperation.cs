@@ -47,7 +47,7 @@ namespace StringOperationUtil
     /// </summary>
     public class OptimizedStringOperation
     {
-        private static OptimizedStringOperation s_this = null;
+        private static OptimizedStringOperation instance = null;
         #if !UNITY_WEBGL
         private static Thread singletonThread = null;
         #endif
@@ -55,7 +55,7 @@ namespace StringOperationUtil
 
         static OptimizedStringOperation()
         {
-            s_this = new OptimizedStringOperation(1024);
+            instance = new OptimizedStringOperation(1024);
         }
         private OptimizedStringOperation(int capacity)
         {
@@ -109,8 +109,8 @@ namespace StringOperationUtil
                     return small;
                 }
                 #endif
-                s_this.sb.Length = 0;
-                return s_this;
+                instance.sb.Length = 0;
+                return instance;
             }
         }
 
