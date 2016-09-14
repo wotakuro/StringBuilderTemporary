@@ -9,15 +9,24 @@ System.Text.StringBufferの使用する方がパフォーマンス的にもメ�
 そこで、処理をまともにするコードを簡単に書けるためのクラスを今回用意しました
 
 
+まず、利用するコードのトップで下記宣言をします。
+------
+using StrOpe = StringOperationUtil.OptimizedStringOperation;
+------
+
+そして、実際のソースを
+----
 string str = "aaa" + 20 + "bbbb"; 
 　　↓
-string str = Sbt.i + "aaa" + 20 + "bbbb"; 
+string str = StrOpe.i + "aaa" + 20 + "bbbb"; 
+----
 とすることで、処理が大分まともになります。
+
 （内部的にはStringBuilderを利用します。
 　operatorで + 演算子の上書き、暗黙的castを書くことで処理向上を行っております)
 
-Sbt.iは、ThreadSafeではありません。あと同じオブジェクトを使いまわします。
-そういうケースで使いたい場合は、Sbt.Create()を代わりに使用してください。
+StrOpe.iは、同じオブジェクトを使いまわしますが、
+そういうケースで使いたい場合は、StrOpe.Create()を代わりに使用してください。
 </pre>
 
 # Stringでの加算処理の重さテスト
@@ -26,7 +35,7 @@ Sbt.iは、ThreadSafeではありません。あと同じオブジェクトを�
 testシーンを開いて実行してみてください。Profilerで確認するとドレほど重いかが確認できます。
 
 画面をクリックすることで、今回の Sbt.iを入れるかどうかの変更が可能になっています。
-画面中の「sbt Flag」がtrueになることで処理が格段に軽くなるのを確認できるかと思います。
+画面中の「StrOpe Flag」がtrueになることで処理が格段に軽くなるのを確認できるかと思います。
 
  
 コチラのテストでは、275 msec掛かっていた以下の処理が 3.5msecまで減ることを確認しております。
