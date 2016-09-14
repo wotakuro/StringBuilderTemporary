@@ -2,17 +2,22 @@
 using System.Collections;
 using System.Threading;
 
+// use "OptimizedStringOperation" as "StrOpe".
 using StrOpe = StringOperationUtil.OptimizedStringOperation;
 
+/// <summary>
+/// TestCode
+/// </summary>
 public class TestScript : MonoBehaviour {
-
 	bool strOpeFlag = true;
 	TextMesh txt;
-	// Use this for initialization
+
+    // Use this for initialization
 	void Start () {
 		txt = this.GetComponent<TextMesh>();
 	}
 
+    // Update
 	void Update() {
 		if (Input.GetMouseButtonDown(0)) {
 			strOpeFlag = !strOpeFlag;

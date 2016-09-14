@@ -28,7 +28,10 @@ namespace StringOperationUtil
 {
     /// <summary>
     /// Using this,you can optimize string concat operation easily.
-    /// You 
+    /// To use this , you should put this on the top of code.
+    /// ------
+    /// using StrOpe = StringOperationUtil.OptimizedStringOperation;
+    /// ------
     /// 
     /// - before code
     /// string str = "aaa" + 20 + "bbbb";
