@@ -35,15 +35,19 @@ namespace StringBufferTemporary
     /// - after code
     /// string str = Sbt.i + "aaa" + 20 + "bbbb";
     /// 
-    /// "Sbt.i" is not "ThreadSafe" , and reuse same object.
+    /// "Sbt.i" is for MainThread , do not call from user thead.
+    /// If "Sbt.i" is called from Mainthread , reuse same object.
     /// 
-    /// You can use "Sbt.small" / "Sbt.medium" / "Sbt.large" instead of "Sbt.i". 
-    /// These are creating instance. So it is "Thread safe".
+    /// You can also use "Sbt.small" / "Sbt.medium" / "Sbt.large" instead of "Sbt.i". 
+    /// These are creating instance.
     /// </summary>
     public class Sbt
     {
-        private static Sbt s_this;
-        private StringBuilder sb;
+        private static Sbt s_this = null;
+        #if !UNITY_WEBGL
+        private static Thread singletonThread = null;
+        #endif
+        private StringBuilder sb = null;
 
         static Sbt()
         {
@@ -82,13 +86,25 @@ namespace StringBufferTemporary
             }
         }
 
-        /// <summary>
-        /// Be careful . This isn't thread safe.
-        /// </summary>
         public static Sbt i
         {
             get
             {
+                #if !UNITY_WEBGL
+                // Bind instance to thread.
+                if (singletonThread == null )
+                {
+                    singletonThread = Thread.CurrentThread;
+                }
+                // check thread...
+                if (singletonThread != Thread.CurrentThread)
+                {
+                    #if DEBUG || UNITY_EDITOR
+                    UnityEngine.Debug.LogError("Execute from another thread.");
+                    #endif
+                    return small;
+                }
+                #endif
                 s_this.sb.Length = 0;
                 return s_this;
             }
